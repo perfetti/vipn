@@ -1,30 +1,13 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
-
-interface WireGuardConfig {
-  name: string;
-  private_key: string;
-  public_key: string;
-  endpoint: string;
-  allowed_ips: string;
-  dns?: string;
-  address: string;
-  persistent_keepalive?: number;
-}
-
-interface ServerConfigItem {
-  id: string;
-  name: string;
-  location: string;
-  endpoint: string;
-}
-
-interface ConnectionStatus {
-  connected: boolean;
-  current_config: string | null;
-  interface: string | null;
-}
+import type {
+  WireGuardConfig,
+  ServerConfigItem,
+  ServerConfigResponse,
+  ConnectionStatus,
+  StatusMessageType,
+} from "./types";
 
 function App() {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({
@@ -38,7 +21,7 @@ function App() {
   const [showServerList, setShowServerList] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>("");
-  const [statusType, setStatusType] = useState<"success" | "error" | "info">("info");
+  const [statusType, setStatusType] = useState<StatusMessageType>("info");
 
   // Load connection status on mount
   useEffect(() => {
@@ -54,7 +37,7 @@ function App() {
     }
   };
 
-  const showStatus = (message: string, type: "success" | "error" | "info" = "info") => {
+  const showStatus = (message: string, type: StatusMessageType = "info") => {
     setStatusMessage(message);
     setStatusType(type);
     setTimeout(() => setStatusMessage(""), 5000);
@@ -96,7 +79,7 @@ function App() {
   const handleLoadFromServer = async () => {
     setIsLoading(true);
     try {
-      const response = await invoke<{ configs: ServerConfigItem[] }>("fetch_config_list");
+      const response = await invoke<ServerConfigResponse>("fetch_config_list");
       setServerConfigs(response.configs);
       setShowServerList(true);
       showStatus(`Loaded ${response.configs.length} server configurations`, "success");

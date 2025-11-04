@@ -199,3 +199,156 @@ pub fn config_to_wg_quick_format(config: &WireGuardConfig) -> String {
     wg_config
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_config() {
+        let config = get_config();
+        assert_eq!(config.name, "Default Config");
+        assert!(!config.private_key.is_empty());
+        assert!(!config.public_key.is_empty());
+        assert!(!config.endpoint.is_empty());
+        assert!(!config.address.is_empty());
+    }
+
+    #[test]
+    fn test_get_config_by_id() {
+        // Test existing configs
+        let us_east = get_config_by_id("us-east-1");
+        assert!(us_east.is_some());
+        assert_eq!(us_east.unwrap().name, "US East Server");
+
+        let us_west = get_config_by_id("us-west-1");
+        assert!(us_west.is_some());
+        assert_eq!(us_west.unwrap().name, "US West Server");
+
+        let eu_central = get_config_by_id("eu-central-1");
+        assert!(eu_central.is_some());
+        assert_eq!(eu_central.unwrap().name, "EU Central Server");
+
+        let asia_pacific = get_config_by_id("asia-pacific-1");
+        assert!(asia_pacific.is_some());
+        assert_eq!(asia_pacific.unwrap().name, "Asia Pacific Server");
+
+        // Test non-existent config
+        let invalid = get_config_by_id("invalid-id");
+        assert!(invalid.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_fetch_config_list_from_server() {
+        let response = fetch_config_list_from_server().await;
+        assert_eq!(response.configs.len(), 4);
+
+        assert_eq!(response.configs[0].id, "us-east-1");
+        assert_eq!(response.configs[0].name, "US East Server");
+        assert_eq!(response.configs[1].id, "us-west-1");
+        assert_eq!(response.configs[2].id, "eu-central-1");
+        assert_eq!(response.configs[3].id, "asia-pacific-1");
+    }
+
+    #[test]
+    fn test_get_connection_status() {
+        let status = get_connection_status();
+        assert_eq!(status.connected, false);
+        assert!(status.current_config.is_none());
+        assert!(status.interface.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_apply_config() {
+        let config = WireGuardConfig {
+            name: "Test Config".to_string(),
+            private_key: "test-private-key".to_string(),
+            public_key: "test-public-key".to_string(),
+            endpoint: "test.example.com:51820".to_string(),
+            allowed_ips: "0.0.0.0/0".to_string(),
+            dns: Some("1.1.1.1".to_string()),
+            address: "10.0.0.1/24".to_string(),
+            persistent_keepalive: Some(25),
+        };
+
+        let result = apply_config(config).await;
+        assert!(result.is_ok());
+        assert!(result.unwrap().contains("applied successfully"));
+    }
+
+    #[tokio::test]
+    async fn test_disconnect() {
+        let result = disconnect().await;
+        assert!(result.is_ok());
+        assert!(result.unwrap().contains("Disconnected"));
+    }
+
+    #[test]
+    fn test_config_to_wg_quick_format() {
+        let config = WireGuardConfig {
+            name: "Test Config".to_string(),
+            private_key: "test-private-key".to_string(),
+            public_key: "test-public-key".to_string(),
+            endpoint: "test.example.com:51820".to_string(),
+            allowed_ips: "0.0.0.0/0".to_string(),
+            dns: Some("1.1.1.1".to_string()),
+            address: "10.0.0.1/24".to_string(),
+            persistent_keepalive: Some(25),
+        };
+
+        let wg_format = config_to_wg_quick_format(&config);
+
+        assert!(wg_format.contains("[Interface]"));
+        assert!(wg_format.contains("PrivateKey = test-private-key"));
+        assert!(wg_format.contains("Address = 10.0.0.1/24"));
+        assert!(wg_format.contains("DNS = 1.1.1.1"));
+        assert!(wg_format.contains("[Peer]"));
+        assert!(wg_format.contains("PublicKey = test-public-key"));
+        assert!(wg_format.contains("Endpoint = test.example.com:51820"));
+        assert!(wg_format.contains("AllowedIPs = 0.0.0.0/0"));
+        assert!(wg_format.contains("PersistentKeepalive = 25"));
+    }
+
+    #[test]
+    fn test_config_to_wg_quick_format_without_optional_fields() {
+        let config = WireGuardConfig {
+            name: "Test Config".to_string(),
+            private_key: "test-private-key".to_string(),
+            public_key: "test-public-key".to_string(),
+            endpoint: "test.example.com:51820".to_string(),
+            allowed_ips: "0.0.0.0/0".to_string(),
+            dns: None,
+            address: "10.0.0.1/24".to_string(),
+            persistent_keepalive: None,
+        };
+
+        let wg_format = config_to_wg_quick_format(&config);
+
+        assert!(wg_format.contains("[Interface]"));
+        assert!(wg_format.contains("PrivateKey = test-private-key"));
+        assert!(!wg_format.contains("DNS"));
+        assert!(wg_format.contains("[Peer]"));
+        assert!(!wg_format.contains("PersistentKeepalive"));
+    }
+
+    #[test]
+    fn test_wireguard_config_serialization() {
+        let config = WireGuardConfig {
+            name: "Test".to_string(),
+            private_key: "key".to_string(),
+            public_key: "pub".to_string(),
+            endpoint: "endpoint".to_string(),
+            allowed_ips: "0.0.0.0/0".to_string(),
+            dns: Some("1.1.1.1".to_string()),
+            address: "10.0.0.1/24".to_string(),
+            persistent_keepalive: Some(25),
+        };
+
+        let json = serde_json::to_string(&config).unwrap();
+        let deserialized: WireGuardConfig = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(config.name, deserialized.name);
+        assert_eq!(config.private_key, deserialized.private_key);
+        assert_eq!(config.public_key, deserialized.public_key);
+    }
+}
+
