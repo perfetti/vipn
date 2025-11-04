@@ -86,6 +86,16 @@ pub fn get_config_by_id(id: &str) -> Option<WireGuardConfig> {
             address: "10.0.0.5/24".to_string(),
             persistent_keepalive: Some(25),
         }),
+        "asia-pacific-1" => Some(WireGuardConfig {
+            name: "Asia Pacific Server".to_string(),
+            private_key: "hI1F5m1tLbZbs4nVKcXuR9KdkUa0c9zR2nL3oP6qT7u=".to_string(),
+            public_key: "bXo6O3zR0R2nL3oP6qT7uVKcXuR9KdkUa0c9zR2nL=".to_string(),
+            endpoint: "asia-pac.vpn.example.com:51820".to_string(),
+            allowed_ips: "0.0.0.0/0".to_string(),
+            dns: Some("8.8.8.8, 8.8.4.4".to_string()),
+            address: "10.0.0.6/24".to_string(),
+            persistent_keepalive: Some(25),
+        }),
         _ => None,
     }
 }

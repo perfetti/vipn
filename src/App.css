@@ -1,10 +1,3 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafb);
-}
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
@@ -21,78 +14,342 @@
   -webkit-text-size-adjust: 100%;
 }
 
-.container {
+* {
+  box-sizing: border-box;
+}
+
+body {
   margin: 0;
-  padding-top: 10vh;
+  padding: 0;
+}
+
+.vpn-app {
+  min-height: 100vh;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #2c3e50;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.connected .status-dot {
+  background-color: #27ae60;
+  box-shadow: 0 0 8px rgba(39, 174, 96, 0.6);
+}
+
+.status-indicator.disconnected .status-dot {
+  background-color: #e74c3c;
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.6);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.app-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  text-align: center;
+  gap: 30px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
+.connection-panel {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
+.connection-controls {
   display: flex;
   justify-content: center;
+  margin-bottom: 20px;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
+.connect-button {
+  padding: 14px 40px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
   border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
   cursor: pointer;
+  transition: all 0.3s;
+  min-width: 150px;
 }
 
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
+.connect-button.connect {
+  background-color: #27ae60;
+  color: white;
 }
 
-input,
-button {
+.connect-button.connect:hover:not(:disabled) {
+  background-color: #229954;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+.connect-button.disconnect {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.connect-button.disconnect:hover:not(:disabled) {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.connect-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-message {
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.status-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.status-message.info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.current-config-name {
+  text-align: center;
+  color: #7f8c8d;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.config-section {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.config-section h2 {
+  margin-top: 0;
+  margin-bottom: 25px;
+  color: #2c3e50;
+  font-size: 24px;
+}
+
+.config-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.config-option {
+  display: flex;
+  flex-direction: column;
+}
+
+.config-option h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #34495e;
+  font-size: 18px;
+}
+
+.config-option button {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #3498db;
+  border-radius: 6px;
+  background-color: #3498db;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.config-option button:hover:not(:disabled) {
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+.config-option button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.config-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  resize: vertical;
+  margin-bottom: 10px;
+  transition: border-color 0.2s;
+}
+
+.config-textarea:focus {
   outline: none;
+  border-color: #3498db;
 }
 
-#greet-input {
-  margin-right: 5px;
+.server-list {
+  margin-top: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.server-list h4 {
+  margin: 0;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+  color: #495057;
+}
+
+.server-item {
+  padding: 15px;
+  border-bottom: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.server-item:last-child {
+  border-bottom: none;
+}
+
+.server-item:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.server-name {
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 5px;
+}
+
+.server-location {
+  font-size: 13px;
+  color: #ffffff;
+  margin-bottom: 3px;
+}
+
+.server-endpoint {
+  font-size: 12px;
+  color: #ffffff;
+  font-family: 'Courier New', monospace;
+}
+
+.config-details {
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.config-details h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #34495e;
+  font-size: 18px;
+}
+
+.config-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-row {
+  display: flex;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #495057;
+  min-width: 120px;
+}
+
+.info-value {
+  color: #212529;
+  word-break: break-all;
+}
+
+.info-value.truncated {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .config-options {
+    grid-template-columns: 1fr;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .vpn-app {
+    padding: 15px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -101,16 +358,50 @@ button {
     background-color: #2f2f2f;
   }
 
-  a:hover {
-    color: #24c8db;
+  .connection-panel,
+  .config-section {
+    background-color: #3a3a3a;
+    color: #f6f6f6;
   }
 
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
+  .app-header h1,
+  .config-section h2,
+  .config-option h3,
+  .config-details h3 {
+    color: #f6f6f6;
   }
-  button:active {
-    background-color: #0f0f0f69;
+
+  .config-textarea {
+    background-color: #2f2f2f;
+    color: #f6f6f6;
+    border-color: #555;
+  }
+
+  .server-list {
+    border-color: #555;
+  }
+
+  .server-list h4 {
+    background-color: #2f2f2f;
+    border-color: #555;
+    color: #f6f6f6;
+  }
+
+  .server-item {
+    border-color: #555;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .server-item:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .info-row {
+    background-color: #2f2f2f;
+  }
+
+  .info-label,
+  .info-value {
+    color: #f6f6f6;
   }
 }
