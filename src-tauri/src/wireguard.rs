@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
 
+// Platform-specific implementations
+pub mod platform;
+
 /// WireGuard configuration structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WireGuardConfig {
