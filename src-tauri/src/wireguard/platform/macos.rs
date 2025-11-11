@@ -5,7 +5,6 @@ use std::process::Command;
 use std::path::PathBuf;
 use tempfile::NamedTempFile;
 use std::io::Write;
-use std::fs;
 use crate::wireguard::config_to_wg_quick_format;
 
 pub struct MacOSPlatform;
@@ -34,9 +33,9 @@ impl MacOSPlatform {
         }
 
         // Check common paths
-        for path in paths {
-            if PathBuf::from(&path).exists() {
-                return Some(path);
+        for path in &paths {
+            if PathBuf::from(path).exists() {
+                return Some(path.to_string());
             }
         }
 
@@ -70,7 +69,7 @@ impl MacOSPlatform {
     }
 
     /// Write config to temporary file
-    fn write_config_file(&self, config: &WireGuardConfig, wg_format: &str) -> Result<PathBuf, WireGuardError> {
+    fn write_config_file(&self, _config: &WireGuardConfig, wg_format: &str) -> Result<PathBuf, WireGuardError> {
         // Create a temporary file with .conf extension
         let mut temp_file = NamedTempFile::new()
             .map_err(|e| WireGuardError::ConfigInvalid(format!("Failed to create temp file: {}", e)))?;
